@@ -16,6 +16,7 @@
 class MyRegistration;
 class LoadFile;
 class MyImageClass;
+class registrationObserver;
 
 class ImageRegistration : public QMainWindow, public Ui::mainWindow
 {
@@ -31,8 +32,7 @@ private:
     QMessageBox msg_box_;
     LoadFile *load_files_hdd_;
     std::vector<MyRegistration*> registration_;
-
-
+    registrationObserver* regobs_;
 
 
 private slots:

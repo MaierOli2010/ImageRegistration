@@ -9,9 +9,11 @@
 #include <vtkImageViewer2.h>
 
 #include "itktypesandincludes.h"
+#include "myregistrationobserver.h"
 
 class MyImageClass;
 class ImageRegistration;
+class registrationObserver;
 
 class MyRegistration
 {
@@ -30,6 +32,7 @@ private:
     ImageRegistration* imreg_;
     MyImageClass* fixed_image_;
     MyImageClass* moving_images_;
+    registrationObserver* regobs_;
 
     FilterType::Pointer connector_result_;
     itk::GDCMImageIO::Pointer gdcmIO_;
@@ -45,6 +48,8 @@ private:
     ResampleFilterType::Pointer resampler_;
     DifferenceFilterType::Pointer difference_;
     RescalerType::Pointer intensity_rescaler_;
+    MyRegistrationObserver::Pointer observer_;
+
 
     int mMinSliderX_result_;
     int mMaxSliderX_result_;

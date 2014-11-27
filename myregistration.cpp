@@ -8,6 +8,7 @@
 #include <QVTKWidget.h>
 #include <itkImageSeriesWriter.h>
 
+
 #include <itkCastImageFilter.h>
 
 MyRegistration::MyRegistration(ImageRegistration *myimreg, MyImageClass* fixed_image,
@@ -26,6 +27,7 @@ MyRegistration::MyRegistration(ImageRegistration *myimreg, MyImageClass* fixed_i
     resampler_ = ResampleFilterType::New();
     difference_ = DifferenceFilterType::New();
     intensity_rescaler_ = RescalerType::New();
+    observer_ = MyRegistrationObserver::New();
 }
 
 MyRegistration::~MyRegistration()
@@ -51,7 +53,7 @@ void MyRegistration::SaveDICOMSeries(QString save_path)
 
     caster->SetInput(resampler_->GetOutput());
     series_writer->SetInput( caster->GetOutput());
-    series_writer->SetImageIO(gdcmIO_);
+    series_writer->SetImageIO(gdcmIO_);class MyRegistrationObserver;
 
     namesGenerator_->SetOutputDirectory( output_directory );
     series_writer->SetFileNames (namesGenerator_->GetOutputFileNames());
@@ -94,7 +96,7 @@ void MyRegistration::StartRegistration()
     optimizer_->SetMaximumStepLength(2.00);
     optimizer_->SetMinimumStepLength(0.01);
     optimizer_->SetNumberOfIterations(200);
-
+    optimizer_->AddObserver( itk::IterationEvent(), observer_);
     try
     {
         registration_->Update();

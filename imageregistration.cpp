@@ -1,13 +1,14 @@
 #include "imageregistration.h"
 
+
 #include <QFileDialog>
 #include <itkImage.h>
 
 #include "myimageclass.h"
 #include "loadFile.h"
+#include "registrationobserver.h"
+
 #include "myregistration.h"
-
-
 
 
 ImageRegistration::ImageRegistration(QMainWindow *parent) :
@@ -188,7 +189,6 @@ void ImageRegistration::StartRegistration()
     {
       registration_[i]->StartRegistration();
     }
-
 }
 
 void ImageRegistration::ShowResultingFit()

@@ -24,9 +24,9 @@
                   loadFile.cpp imageregistration.h loadFile.h
                  itkImageToVTKImageFilter.txx itkVTKImageToImageFilter.txx itktypesandincludes.h
                  myexceptions.cpp myexceptions.h myimageclass.cpp myimageclass.h myregistration.cpp
-                 myregistration.h)
+                 myregistration.h registrationobserver.cpp myregistrationobserver.cpp)
 
-  set(image_registration_FORMS imageregistration.ui)
+  set(image_registration_FORMS imageregistration.ui registrationobserver.ui)
 
   QT5_WRAP_UI(imreg_FORMS_HEADERS ${image_registration_FORMS})
 

@@ -13,7 +13,8 @@
 #include <itkSubtractImageFilter.h>
 #include <itkRescaleIntensityImageFilter.h>
 #include "itkImageToVTKImageFilter.h"
-
+#include <itkMetaImageIOFactory.h>
+#include <itkDCMTKImageIOFactory.h>
 
 
 // Some Typedefs and Definitions for ITK
