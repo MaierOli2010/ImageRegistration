@@ -19,7 +19,7 @@ class MyRegistration
 {
 public:
     explicit MyRegistration(ImageRegistration *myimreg, MyImageClass* fixed_image,
-                            MyImageClass* moving_images);
+                            std::unique_ptr<MyImageClass> *moving_images);
     ~MyRegistration();
     void SaveDICOMSeries(QString save_path);
     void StartRegistration();
@@ -31,13 +31,17 @@ private:
     void ComputeDifference();
     ImageRegistration* imreg_;
     MyImageClass* fixed_image_;
-    MyImageClass* moving_images_;
+    std::unique_ptr<MyImageClass>* moving_images_;
     registrationObserver* regobs_;
 
     FilterType::Pointer connector_result_;
     itk::GDCMImageIO::Pointer gdcmIO_;
     itk::GDCMSeriesFileNames::Pointer namesGenerator_;
     vtkSmartPointer<vtkImageViewer2> imageViewerDCMSeriesX_result_;
+    ImageCasterType::Pointer fixedImageCaster_;
+    ImageCasterType::Pointer movingImageCaster_;
+    MatchingFilterType::Pointer matcher_;
+
 
 
     MetricType::Pointer metric_;

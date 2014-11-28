@@ -81,7 +81,7 @@ void ImageRegistration::ShowMoving()
         if(load_files_hdd_->GetFileName().isEmpty() == false)
         {
            stackedWidget -> setCurrentIndex(2);
-           moving_image_vec_.push_back(new MyImageClass(this));
+           moving_image_vec_.push_back(std::unique_ptr<MyImageClass>(new MyImageClass(this)));
            moving_image_vec_.back()->SetFileName(load_files_hdd_->GetPath(), load_files_hdd_->GetFileName());
            moving_image_vec_.back()->GetDICOMSeries();
         }
@@ -110,7 +110,7 @@ void ImageRegistration::AddMovingSeries()
             return;
         }
 
-       moving_image_vec_.push_back(new MyImageClass(this));
+       moving_image_vec_.push_back(std::unique_ptr<MyImageClass>(new MyImageClass(this)));
        moving_image_vec_.back()->SetFileName(load_files_hdd_->GetPath(), load_files_hdd_->GetFileName());
        moving_image_vec_.back()->GetDICOMSeries();
     }
@@ -174,7 +174,7 @@ void ImageRegistration::StartRegistration()
     {
         for(int i = 0; i < moving_image_vec_.size(); ++i)
         {
-            registration_.push_back(new MyRegistration(this, fixed_image_, moving_image_vec_[i]));
+            registration_.push_back(std::unique_ptr<MyRegistration>(new MyRegistration(this, fixed_image_, &moving_image_vec_[i])));
         }
     }
     else
@@ -182,7 +182,7 @@ void ImageRegistration::StartRegistration()
       registration_.clear();
       for(int i = 0; i < moving_image_vec_.size(); ++i)
       {
-          registration_.push_back(new MyRegistration(this, fixed_image_, moving_image_vec_[i]));
+          registration_.push_back(std::unique_ptr<MyRegistration>(new MyRegistration(this, fixed_image_, &moving_image_vec_[i])));
       }
     }
     for(int i = 0; i < moving_image_vec_.size(); ++i)

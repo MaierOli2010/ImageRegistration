@@ -30,8 +30,8 @@ public:
 
 private:
 
-    std::string iteration_ = NULL;
-    std::string value_ = NULL;
+    std::string iteration_;
+    std::string value_;
 };
 
 #endif // MYREGISTRATIONOBSERVER_H

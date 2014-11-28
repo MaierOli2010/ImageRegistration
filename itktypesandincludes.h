@@ -15,24 +15,37 @@
 #include "itkImageToVTKImageFilter.h"
 #include <itkMetaImageIOFactory.h>
 #include <itkDCMTKImageIOFactory.h>
+#include <itkCastImageFilter.h>
+#include <itkHistogramMatchingImageFilter.h>
 
 
 // Some Typedefs and Definitions for ITK
 typedef  signed short PixelType;
 static const unsigned int dimension = 3;
+typedef float InternalPixelType;
+typedef itk::Image< InternalPixelType, dimension> InternalImageType;
+
 typedef itk::Image<PixelType, dimension> ImageType;
 typedef itk::ImageSeriesReader< ImageType > ReaderType;
 typedef itk::ImageToVTKImageFilter <ImageType> FilterType;
 typedef itk::GDCMImageIO ImageIOType;
 typedef itk::GDCMSeriesFileNames NamesGeneratorType;
 
+typedef itk::CastImageFilter <ImageType, InternalImageType> ImageCasterType;
+typedef itk::HistogramMatchingImageFilter<InternalImageType, InternalImageType> MatchingFilterType;
+
+
 typedef itk::TranslationTransform<double, dimension> TransformType;
 typedef itk::RegularStepGradientDescentOptimizer OptimizerType;
-typedef itk::MeanSquaresImageToImageMetric<ImageType, ImageType> MetricType;
-typedef itk::LinearInterpolateImageFunction< ImageType, double> InterpolatorType;
-typedef itk::ImageRegistrationMethod<ImageType, ImageType> RegistrationType;
-typedef itk::ResampleImageFilter<ImageType, ImageType> ResampleFilterType;
-typedef itk::SubtractImageFilter<ImageType,ImageType,ImageType> DifferenceFilterType;
+typedef itk::MeanSquaresImageToImageMetric<InternalImageType, InternalImageType> MetricType;
+typedef itk::LinearInterpolateImageFunction< InternalImageType, double> InterpolatorType;
+typedef itk::ImageRegistrationMethod<InternalImageType, InternalImageType> RegistrationType;
+typedef itk::ResampleImageFilter<ImageType, InternalImageType> ResampleFilterType;
+typedef itk::SubtractImageFilter<ImageType,InternalImageType,ImageType> DifferenceFilterType;
 typedef itk::RescaleIntensityImageFilter<ImageType,ImageType> RescalerType;
+
+
+
+
 
 #endif // DICOMTYPEDEFS_H

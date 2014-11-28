@@ -10,8 +10,7 @@
   # to always look for includes there:
   set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-  #set(image_registration_SOURCES main.cpp loadFile.cpp imageregistration.cpp getfilesfromhdd.cpp)
-  #set(image_registration_HEADERS loadFile.h imageregistration.h gefilesfromhdd.h)
+  set(CMAKE_CXX_FLAGS "-std=c++11")
 
   # Widgets finds its own dependencies.
   find_package(Qt5Widgets REQUIRED)

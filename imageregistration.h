@@ -6,7 +6,7 @@
 #include <QMessageBox>
 #include <QVTKWidget.h>
 #include <vector>
-
+#include <memory>
 
 
 #define FIXED 1
@@ -28,10 +28,10 @@ public:
     
 private:
     MyImageClass *fixed_image_;
-    std::vector<MyImageClass*> moving_image_vec_;
+    std::vector<std::unique_ptr<MyImageClass>> moving_image_vec_;
     QMessageBox msg_box_;
     LoadFile *load_files_hdd_;
-    std::vector<MyRegistration*> registration_;
+    std::vector<std::unique_ptr<MyRegistration>> registration_;
     registrationObserver* regobs_;
 
 

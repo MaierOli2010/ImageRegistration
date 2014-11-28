@@ -12,7 +12,7 @@
 #include <itkCastImageFilter.h>
 
 MyRegistration::MyRegistration(ImageRegistration *myimreg, MyImageClass* fixed_image,
-                               MyImageClass* moving_images):
+                               std::unique_ptr<MyImageClass>* moving_images):
     imreg_(myimreg),
     fixed_image_(fixed_image),
     moving_images_(moving_images)
@@ -28,6 +28,9 @@ MyRegistration::MyRegistration(ImageRegistration *myimreg, MyImageClass* fixed_i
     difference_ = DifferenceFilterType::New();
     intensity_rescaler_ = RescalerType::New();
     observer_ = MyRegistrationObserver::New();
+    fixedImageCaster_ = ImageCasterType::New();
+    movingImageCaster_ = ImageCasterType::New();
+    matcher_ = MatchingFilterType::New();
 }
 
 MyRegistration::~MyRegistration()
@@ -43,7 +46,7 @@ void MyRegistration::SaveDICOMSeries(QString save_path)
     const unsigned int output_pixel_dimension = 2;
 
     typedef itk::Image < OutputPixelType, output_pixel_dimension > Image2Dtype;
-    typedef itk::CastImageFilter<ImageType, ImageType> CastFilterType;
+    typedef itk::CastImageFilter<InternalImageType, ImageType> CastFilterType;
 
     typedef itk::ImageSeriesWriter < ImageType, Image2Dtype> SeriesWriterType;
 
@@ -81,8 +84,18 @@ void MyRegistration::StartRegistration()
     registration_->SetTransform(transform_);
     registration_->SetInterpolator(interpolator_);
 
-    registration_->SetFixedImage(fixed_image_->GetReader()->GetOutput());
-    registration_->SetMovingImage(moving_images_->GetReader()->GetOutput());
+    //Intensity Rescaling and casting of Images to internal Image Type (float)
+    fixedImageCaster_->SetInput(fixed_image_->GetReader()->GetOutput());
+    movingImageCaster_->SetInput((*moving_images_)->GetReader()->GetOutput());
+
+    matcher_->SetInput(movingImageCaster_->GetOutput());
+    matcher_->SetReferenceImage(fixedImageCaster_->GetOutput());
+    matcher_->SetNumberOfHistogramLevels(1024);
+    matcher_->SetNumberOfMatchPoints(7);
+    matcher_->ThresholdAtMeanIntensityOn();
+
+    registration_->SetFixedImage(fixedImageCaster_->GetOutput());
+    registration_->SetMovingImage(matcher_->GetOutput());
     registration_->SetFixedImageRegion(fixed_image_->GetReader()->GetOutput()->GetBufferedRegion());
 
     typedef RegistrationType::ParametersType ParametersType;
@@ -113,7 +126,7 @@ void MyRegistration::StartRegistration()
     const unsigned int number_of_it = optimizer_->GetCurrentIteration();
     const double best_value = optimizer_->GetValue();
 
-    resampler_->SetInput(moving_images_->GetReader()->GetOutput());
+    resampler_->SetInput((*moving_images_)->GetReader()->GetOutput());
     resampler_->SetTransform(registration_->GetOutput()->Get());
     resampler_->SetSize(fixed_image_->GetReader()->GetOutput()->GetLargestPossibleRegion().GetSize());
     resampler_->SetOutputOrigin(fixed_image_->GetReader()->GetOutput()->GetOrigin());
@@ -131,8 +144,14 @@ void MyRegistration::ShowResultingFit()
     connector_result_ = FilterType::New();
 
     connector_result_->SetInput(intensity_rescaler_->GetOutput());
-    connector_result_->Update();
-
+    try
+    {
+      connector_result_->Update();
+    }
+    catch(itk::ExceptionObject &err)
+    {
+        throw err;
+    }
 
     imageViewerDCMSeriesX_result_->SetInputData(connector_result_->GetOutput());
 
