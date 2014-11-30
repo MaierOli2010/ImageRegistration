@@ -25,6 +25,7 @@ class ImageRegistration : public QMainWindow, public Ui::mainWindow
 public:
     explicit ImageRegistration(QMainWindow *parent = 0);
     ~ImageRegistration();
+    std::unique_ptr<registrationObserver>* GetObserverWindow();
     
 private:
     MyImageClass *fixed_image_;
@@ -32,7 +33,7 @@ private:
     QMessageBox msg_box_;
     LoadFile *load_files_hdd_;
     std::vector<std::unique_ptr<MyRegistration>> registration_;
-    registrationObserver* regobs_;
+    std::unique_ptr<registrationObserver> regobs_window_;
 
 
 private slots:

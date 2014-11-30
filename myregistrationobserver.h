@@ -3,9 +3,9 @@
 
 #include <itkCommand.h>
 #include "itktypesandincludes.h"
-#include <QWidget>
-#include <string>
+#include <memory>
 
+#include "registrationobserver.h"
 
 
 class MyRegistrationObserver : public itk::Command
@@ -17,21 +17,19 @@ public:
     typedef MyRegistrationObserver Self;
     typedef itk::Command Superclass;
     typedef itk::SmartPointer<Self> Pointer;
-
     itkNewMacro(Self)
+
 
     //Const interface ensures that all options invoked on the optimizer are read-only
     typedef const OptimizerType* OptimizerPointer;
     void Execute(itk::Object *caller, const itk::EventObject &event);
     void Execute(const itk::Object *object, const itk::EventObject &event);
 
-    std::string getIteration(void);
-    std::string getValue(void);
+
+    void setObserverWindow(std::unique_ptr<registrationObserver> *regobs);
 
 private:
-
-    std::string iteration_;
-    std::string value_;
+    std::unique_ptr<registrationObserver>* regobs_;
 };
 
 #endif // MYREGISTRATIONOBSERVER_H

@@ -17,6 +17,8 @@ ImageRegistration::ImageRegistration(QMainWindow *parent) :
     setupUi(this);
     load_files_hdd_ = new LoadFile(this);
     fixed_image_ = new MyImageClass(this);
+    regobs_window_ =  std::unique_ptr<registrationObserver> (new registrationObserver);
+    regobs_window_->hide();
 
     connect(actionLoad_Files, SIGNAL(triggered()), this, SLOT(ShowFileLoad()));
     connect(actionSave_Files, SIGNAL(triggered()), this, SLOT(SaveFiles()));
@@ -118,6 +120,7 @@ void ImageRegistration::AddMovingSeries()
 
 void ImageRegistration::ShowComputing()
 {
+    regobs_window_->show();
     verticalSlider->setMinimum(0);
     verticalSlider->setMaximum(moving_image_vec_.size()-1);
     try
@@ -170,6 +173,7 @@ void ImageRegistration::SaveFiles()
 }
 void ImageRegistration::StartRegistration()
 {
+
     if(registration_.empty())
     {
         for(int i = 0; i < moving_image_vec_.size(); ++i)
@@ -200,4 +204,9 @@ void ImageRegistration::ShowResultingFit()
 void ImageRegistration::SelectMovingSeries(int position)
 {
     moving_image_vec_[position]->DrawDicomImg();
+}
+
+std::unique_ptr<registrationObserver>* ImageRegistration::GetObserverWindow()
+{
+    return &regobs_window_;
 }

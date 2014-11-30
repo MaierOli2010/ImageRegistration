@@ -6,9 +6,17 @@
 #include <itkGDCMSeriesFileNames.h>
 #include <itkImageSeriesReader.h>
 #include <itkImageRegistrationMethod.h>
-#include <itkTranslationTransform.h>
+
+//using non rigid transform instead of Translation Transform
+//#include <itkTranslationTransform.h>
+
+
 #include <itkMeanSquaresImageToImageMetric.h>
-#include <itkRegularStepGradientDescentOptimizer.h>
+
+// Using LBFGSOptimizer instead
+//#include <itkRegularStepGradientDescentOptimizer.h>
+
+
 #include <itkResampleImageFilter.h>
 #include <itkSubtractImageFilter.h>
 #include <itkRescaleIntensityImageFilter.h>
@@ -17,6 +25,10 @@
 #include <itkDCMTKImageIOFactory.h>
 #include <itkCastImageFilter.h>
 #include <itkHistogramMatchingImageFilter.h>
+
+
+#include "itkBSplineTransform.h"
+#include "itkLBFGSBOptimizer.h"
 
 
 // Some Typedefs and Definitions for ITK
@@ -35,8 +47,11 @@ typedef itk::CastImageFilter <ImageType, InternalImageType> ImageCasterType;
 typedef itk::HistogramMatchingImageFilter<InternalImageType, InternalImageType> MatchingFilterType;
 
 
-typedef itk::TranslationTransform<double, dimension> TransformType;
-typedef itk::RegularStepGradientDescentOptimizer OptimizerType;
+//typedef itk::TranslationTransform<double, dimension> TransformType;
+
+//typedef itk::RegularStepGradientDescentOptimizer OptimizerType;
+
+
 typedef itk::MeanSquaresImageToImageMetric<InternalImageType, InternalImageType> MetricType;
 typedef itk::LinearInterpolateImageFunction< InternalImageType, double> InterpolatorType;
 typedef itk::ImageRegistrationMethod<InternalImageType, InternalImageType> RegistrationType;
@@ -44,8 +59,13 @@ typedef itk::ResampleImageFilter<ImageType, InternalImageType> ResampleFilterTyp
 typedef itk::SubtractImageFilter<ImageType,InternalImageType,ImageType> DifferenceFilterType;
 typedef itk::RescaleIntensityImageFilter<ImageType,ImageType> RescalerType;
 
+//non-rigid Transform typedefs
+static const unsigned int SpaceDimension = dimension;
+//maybe change SplineOrder later
+static const unsigned int SplineOrder = 3;
+typedef double CoordinateRepType;
+typedef itk::BSplineTransform<CoordinateRepType,SpaceDimension,SplineOrder> TransformType;
 
-
-
+typedef itk::LBFGSBOptimizer OptimizerType;
 
 #endif // DICOMTYPEDEFS_H

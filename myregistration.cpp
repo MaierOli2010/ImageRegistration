@@ -11,6 +11,9 @@
 
 #include <itkCastImageFilter.h>
 
+#include "registrationobserver.h"
+#include "ui_registrationobserver.h"
+
 MyRegistration::MyRegistration(ImageRegistration *myimreg, MyImageClass* fixed_image,
                                std::unique_ptr<MyImageClass>* moving_images):
     imreg_(myimreg),
@@ -31,6 +34,7 @@ MyRegistration::MyRegistration(ImageRegistration *myimreg, MyImageClass* fixed_i
     fixedImageCaster_ = ImageCasterType::New();
     movingImageCaster_ = ImageCasterType::New();
     matcher_ = MatchingFilterType::New();
+    observer_->setObserverWindow(myimreg->GetObserverWindow());
 }
 
 MyRegistration::~MyRegistration()
@@ -84,6 +88,29 @@ void MyRegistration::StartRegistration()
     registration_->SetTransform(transform_);
     registration_->SetInterpolator(interpolator_);
 
+    TransformType::PhysicalDimensionsType    fixedPhysicalDimensions;
+    TransformType::MeshSizeType    meshSize;
+    TransformType::OriginType    fixedOrigin;
+
+    unsigned int numberOfGridNodesInOneDimension = 12;
+
+
+    for( unsigned int i=0; i< SpaceDimension; i++ )
+    {
+        fixedOrigin[i] = fixed_image_->GetReader()->GetOutput()->GetOrigin()[i];
+        fixedPhysicalDimensions[i] = fixed_image_->GetReader()->GetOutput()->GetSpacing()[i] *
+        static_cast<double>(
+        fixed_image_->GetReader()->GetOutput()->GetLargestPossibleRegion().GetSize()[i] - 1 );
+    }
+    meshSize.Fill( numberOfGridNodesInOneDimension - SplineOrder );
+    transform_->SetTransformDomainOrigin( fixedOrigin );
+    transform_->SetTransformDomainPhysicalDimensions( fixedPhysicalDimensions );
+    transform_->SetTransformDomainMeshSize( meshSize );
+    transform_->SetTransformDomainDirection( fixed_image_->GetReader()->GetOutput()->GetDirection() );
+
+
+
+
     //Intensity Rescaling and casting of Images to internal Image Type (float)
     fixedImageCaster_->SetInput(fixed_image_->GetReader()->GetOutput());
     movingImageCaster_->SetInput((*moving_images_)->GetReader()->GetOutput());
@@ -99,17 +126,49 @@ void MyRegistration::StartRegistration()
     registration_->SetFixedImageRegion(fixed_image_->GetReader()->GetOutput()->GetBufferedRegion());
 
     typedef RegistrationType::ParametersType ParametersType;
-    ParametersType initial_parameters( transform_->GetNumberOfParameters());
 
-    initial_parameters[0] = 0.0;
-    initial_parameters[1] = 0.0;
+    const unsigned int numberOfParameters = transform_->GetNumberOfParameters();
 
-    registration_->SetInitialTransformParameters (initial_parameters);
+    ParametersType parameters( numberOfParameters );
+    parameters.Fill( 0.0 );
 
-    optimizer_->SetMaximumStepLength(2.00);
-    optimizer_->SetMinimumStepLength(0.01);
-    optimizer_->SetNumberOfIterations(200);
-    optimizer_->AddObserver( itk::IterationEvent(), observer_);
+    //ParametersType initial_parameters( transform_->GetNumberOfParameters());
+    //Parameters for translation registration
+    //initial_parameters[0] = 0.0;
+    //initial_parameters[1] = 0.0;
+
+    //registration_->SetInitialTransformParameters (initial_parameters);
+
+    registration_->SetInitialTransformParameters(transform_->GetParameters());
+
+    //Optimizer for rigid transform
+    //optimizer_->SetMaximumStepLength(2.00);
+    //optimizer_->SetMinimumStepLength(0.01);
+    //optimizer_->SetNumberOfIterations(200);
+    //optimizer_->AddObserver( itk::IterationEvent(), observer_);
+
+    //optimizer_->SetGradientConvergenceTolerance( 0.05 );
+    //optimizer_->SetLineSearchAccuracy( 0.9 );
+    //optimizer_->SetDefaultStepLength( 1.5 );
+    //optimizer_->TraceOn();
+    //optimizer_->SetMaximumNumberOfFunctionEvaluations( 1000 );
+
+    OptimizerType::BoundSelectionType boundSelect( numberOfParameters );
+    OptimizerType::BoundValueType upperBound( numberOfParameters );
+    OptimizerType::BoundValueType lowerBound( numberOfParameters );
+    boundSelect.Fill( 0 );
+    upperBound.Fill( 0.0 );
+    lowerBound.Fill( 0.0 );
+    optimizer_->SetBoundSelection( boundSelect );
+    optimizer_->SetUpperBound( upperBound );
+    optimizer_->SetLowerBound( lowerBound );
+    optimizer_->SetCostFunctionConvergenceFactor( 1.e7 );
+    optimizer_->SetProjectedGradientTolerance( 1e-6 );
+    optimizer_->SetMaximumNumberOfIterations( 200 );
+    optimizer_->SetMaximumNumberOfEvaluations( 30 );
+    optimizer_->SetMaximumNumberOfCorrections( 5 );
+    optimizer_->AddObserver( itk::AnyEvent(), observer_);
+    //registration_->AddObserver( itk::IterationEvent(), observer_);
     try
     {
         registration_->Update();
@@ -121,10 +180,10 @@ void MyRegistration::StartRegistration()
 
     ParametersType final_parameters = registration_->GetLastTransformParameters();
 
-    const double x_trans = final_parameters[0];
-    const double y_trans = final_parameters[1];
-    const unsigned int number_of_it = optimizer_->GetCurrentIteration();
-    const double best_value = optimizer_->GetValue();
+    //const double x_trans = final_parameters[0];
+    //const double y_trans = final_parameters[1];
+    //const unsigned int number_of_it = optimizer_->GetCurrentIteration();
+    //const double best_value = optimizer_->GetValue();
 
     resampler_->SetInput((*moving_images_)->GetReader()->GetOutput());
     resampler_->SetTransform(registration_->GetOutput()->Get());

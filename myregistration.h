@@ -32,7 +32,7 @@ private:
     ImageRegistration* imreg_;
     MyImageClass* fixed_image_;
     std::unique_ptr<MyImageClass>* moving_images_;
-    registrationObserver* regobs_;
+
 
     FilterType::Pointer connector_result_;
     itk::GDCMImageIO::Pointer gdcmIO_;
@@ -54,6 +54,7 @@ private:
     RescalerType::Pointer intensity_rescaler_;
     MyRegistrationObserver::Pointer observer_;
 
+    std::shared_ptr<registrationObserver> regobs_window_;
 
     int mMinSliderX_result_;
     int mMaxSliderX_result_;

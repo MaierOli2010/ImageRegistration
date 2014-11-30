@@ -1,5 +1,10 @@
 #include "myregistrationobserver.h"
 
+#include "ui_registrationobserver.h"
+#include <QMessageBox>
+
+#include <QWidget>
+#include <string>
 
 MyRegistrationObserver::MyRegistrationObserver()
 {
@@ -12,25 +17,34 @@ void MyRegistrationObserver::Execute(itk::Object *caller, const itk::EventObject
 void MyRegistrationObserver::Execute(const itk::Object *object, const itk::EventObject &event)
 {
     OptimizerPointer optimizer = dynamic_cast< OptimizerPointer>( object );
-    if (! itk::IterationEvent().CheckEvent (&event))
+    if( typeid( &event ) == typeid( itk::StartEvent ))
     {
+
+    }
+    if (! (typeid( &event ) == typeid( itk::IterationEvent )))
+    {
+//        QMessageBox msg_box;
+//        msg_box.setText("no iteration event");
+//        msg_box.show();
+        std::string iteration = std::to_string(optimizer->GetCurrentIteration());
+        (*regobs_)->ui->listWidget->addItem(iteration.c_str());
         return;
     }
-    iteration_ = optimizer->GetCurrentIteration();
-    value_ = optimizer->GetValue();
-}
+//    QMessageBox msg_box;
+//    msg_box.setText("iteration event");
+//    msg_box.show();
+    std::string iteration = std::to_string(optimizer->GetCurrentIteration());
+    (*regobs_)->ui->listWidget->addItem(iteration.c_str());
 
 
-std::string MyRegistrationObserver::getIteration(void)
-{
-    return iteration_;
 }
 
-std::string MyRegistrationObserver::getValue(void)
-{
-    return value_;
-}
 MyRegistrationObserver::~MyRegistrationObserver()
 {
 
+}
+
+void MyRegistrationObserver::setObserverWindow(std::unique_ptr<registrationObserver>* regobs)
+{
+    regobs_ = regobs;
 }

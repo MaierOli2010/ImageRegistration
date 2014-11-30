@@ -1,6 +1,6 @@
 #include "registrationobserver.h"
 #include "ui_registrationobserver.h"
-#include "registrationobserver.h"
+
 
 registrationObserver::registrationObserver(QWidget *parent) :
     QWidget(parent),
