@@ -14,12 +14,16 @@
 ImageRegistration::ImageRegistration(QMainWindow *parent) :
     QMainWindow(parent)
 {
+    //Setup Main UI
     setupUi(this);
     load_files_hdd_ = new LoadFile(this);
     fixed_image_ = new MyImageClass(this);
+    //create Observerwindow
     regobs_window_ =  std::unique_ptr<registrationObserver> (new registrationObserver);
     regobs_window_->hide();
 
+
+    //Connect Signals from the UI to SLOTS
     connect(actionLoad_Files, SIGNAL(triggered()), this, SLOT(ShowFileLoad()));
     connect(actionSave_Files, SIGNAL(triggered()), this, SLOT(SaveFiles()));
     connect(actionQuit, SIGNAL(triggered()), qApp, SLOT(quit()));
@@ -46,11 +50,17 @@ ImageRegistration::~ImageRegistration()
 void ImageRegistration::ShowFileLoad()
 {
     load_files_hdd_->LoadFileNames();
+    //Check if a Files was selected and change to next Window
     if(load_files_hdd_->GetFileName().isEmpty() == false)
     {
        stackedWidget -> setCurrentIndex(1);
        fixed_image_->SetFileName(load_files_hdd_->GetPath(), load_files_hdd_->GetFileName());
        fixed_image_->GetDICOMSeries();
+    }
+    //check if a moving series is already loaded. If true clear it.
+    if(moving_image_vec_.empty() == false)
+    {
+        moving_image_vec_.clear();
     }
 }
 
@@ -61,6 +71,7 @@ void ImageRegistration::ShowMoving()
         msg_box_.setText("Please choose a DICOM File");
         msg_box_.exec();
     }
+    //Select a Moving Series and load it into Memory. The series gets stored in the moving_image_vec_ Vektor.
     else
     {
         try
@@ -118,6 +129,7 @@ void ImageRegistration::AddMovingSeries()
     }
 }
 
+// Show both Images and visualy compare them.
 void ImageRegistration::ShowComputing()
 {
     regobs_window_->show();
@@ -142,24 +154,26 @@ void ImageRegistration::ShowComputing()
     stackedWidget -> setCurrentIndex(3);
 }
 
+//Changes the current Fixed Image depending on slider position
 void ImageRegistration::SliderMovedFixed(int position)
 
 {
     fixed_image_->SetSlicePosition(position);
 }
-
+//Changes the current Moving Image depending on slider position
 void ImageRegistration::SliderMovedMoving(int position)
 
 {
   moving_image_vec_[verticalSlider->value()]->SetSlicePosition(position);
 }
-
+//Changes the current Resulting Image depending on slider position
 void ImageRegistration::SliderMovedResult(int position)
 
 {
     registration_[0]->SetSlicePositionResult(position);
 }
 
+//Saves the registrated images to a specified folder
 void ImageRegistration::SaveFiles()
 {
     load_files_hdd_->SaveDirectoryPath();
@@ -171,6 +185,8 @@ void ImageRegistration::SaveFiles()
         }
     }
 }
+
+//Registrate the Moving Series to the fixed one
 void ImageRegistration::StartRegistration()
 {
 
@@ -194,18 +210,19 @@ void ImageRegistration::StartRegistration()
       registration_[i]->StartRegistration();
     }
 }
-
+//Shows the Resulting fit for the registrated Series. At the moment only the first series is displayed because
+//there is a bug when visualizing more than 1 series. Still more work needed here
 void ImageRegistration::ShowResultingFit()
 {
     stackedWidget -> setCurrentIndex(4);
     registration_[0]->ShowResultingFit();
 }
-
+//Selext the moving series which should be displayed depending on the slider position. Doesn't work properly!!!
 void ImageRegistration::SelectMovingSeries(int position)
 {
-    moving_image_vec_[position]->DrawDicomImg();
+    moving_image_vec_[position]->RedrawDICOMImg();
 }
-
+//Provides a pointer to the observer window
 std::unique_ptr<registrationObserver>* ImageRegistration::GetObserverWindow()
 {
     return &regobs_window_;

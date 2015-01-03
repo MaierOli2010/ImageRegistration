@@ -34,16 +34,18 @@ MyImageClass::MyImageClass(ImageRegistration *myimreg):
 MyImageClass::~MyImageClass()
 {
 }
-
+//Loads the Dicomfiles into the memory
 void MyImageClass::LoadDICOM()
 {
   try
   {
+    //check if a Fixed and Moving Series was selected
     if(imreg_->listWidget->currentIndex().isValid() == false &&
             imreg_->listWidgetMoving->currentIndex().isValid() == false)
     {
         throw exception_;
     }
+    //Load the Fixed Image Series into Memory.
     if(imreg_->listWidget->currentIndex().isValid() == true && imreg_->stackedWidget->currentIndex() == 1)
     {
       const ReaderType::FileNamesContainer & filenames =
@@ -53,6 +55,7 @@ void MyImageClass::LoadDICOM()
       reader_->SetImageIO(gdcmIO_);
       reader_->SetFileNames (filenames);
     }
+    //Load the Moving Image Series into Memory.
     else
     {
       const ReaderType::FileNamesContainer & filenames =
@@ -70,20 +73,23 @@ void MyImageClass::LoadDICOM()
     {
         throw excp;
     }
+    //Display the loaded Series
     DrawDICOMImg();
 }
 
 
-
+//Set the Path and Filename
 void MyImageClass::SetFileName(QString mypath, QStringList myfiles)
 {
     path_ = mypath;
     files_ = myfiles;
 }
 
-
+//Function to Display the loaded Series
 void MyImageClass::DrawDICOMImg()
 {
+  //Connector_ connects the ITK Image to a VTK Image which can be displayed
+  // with the VTK ImageViewer in a QVTK-Widget.
   connector_ = FilterType::New();
 
   connector_->SetInput(reader_->GetOutput());
@@ -94,7 +100,7 @@ void MyImageClass::DrawDICOMImg()
   mMinSliderX_ = imageViewerDCMSeriesX_->GetSliceMin();
   mMaxSliderX_ = imageViewerDCMSeriesX_->GetSliceMax();
 
-
+  //Check if the stored series is the Fixed series
   if(imreg_->stackedWidget->currentIndex() == 1)
   {
       imreg_->hSliderFixed->setMinimum(mMinSliderX_);
@@ -117,7 +123,7 @@ void MyImageClass::SetSlicePosition(int position)
     imageViewerDCMSeriesX_->Render();
 }
 
-
+//Identifies all Dicom Series in the specified folder and display them
 void MyImageClass::GetDICOMSeries()
 {
   gdcmIO_ = ImageIOType::New();
@@ -144,13 +150,16 @@ void MyImageClass::GetDICOMSeries()
   }
 }
 
-void MyImageClass::DrawDicomImg()
+void MyImageClass::RedrawDICOMImg()
 {
   imreg_->hSliderMoving->setMinimum(mMinSliderX_);
   imreg_->hSliderMoving->setMaximum(mMaxSliderX_);
   imageViewerDCMSeriesX_->Render();
+  imreg_->vtkRenderer2->GetInteractor()->Render();
+  imreg_->vtkRenderer2->update();
 }
 
+//Returns the Pointer to the Stored Dicom Series
 ReaderType::Pointer MyImageClass::GetReader()
 {
     return reader_;

@@ -24,7 +24,7 @@ public:
         void LoadDICOM();
         void SetSlicePosition(int position);
         void GetDICOMSeries();
-        void DrawDicomImg();
+        void RedrawDICOMImg();
         ReaderType::Pointer GetReader();
 
     private:

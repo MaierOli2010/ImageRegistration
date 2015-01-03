@@ -92,7 +92,8 @@ void MyRegistration::StartRegistration()
     TransformType::MeshSizeType    meshSize;
     TransformType::OriginType    fixedOrigin;
 
-    unsigned int numberOfGridNodesInOneDimension = 12;
+    //Default Nodes = 8
+    unsigned int numberOfGridNodesInOneDimension = 2;
 
 
     for( unsigned int i=0; i< SpaceDimension; i++ )

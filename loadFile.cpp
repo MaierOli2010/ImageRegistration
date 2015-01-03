@@ -11,20 +11,20 @@ LoadFile::LoadFile(ImageRegistration *imregistration):
 
 LoadFile::~LoadFile(){
 }
-
+//Returns the names of the selected files
 QStringList LoadFile::GetFileName(){
     return file_names_;
 }
-
+//Returns the Path of the selected files
 QString LoadFile::GetPath(){
     return path_;
 }
-
+//Returns the Path to the folder for saving the files
 QString LoadFile::GetSavePath()
 {
     return save_path_;
 }
-
+//Opens the Filedialog. Choosing multiple files and the file path
 void LoadFile::LoadFileNames(){
     file_names_ = QFileDialog::getOpenFileNames(myimageregistration_, tr("Open File"),
                                          "",
@@ -36,7 +36,7 @@ void LoadFile::LoadFileNames(){
     }
 
 }
-
+//Specifies the path for saving the files
 void LoadFile::SaveDirectoryPath()
 {
     save_path_ = QFileDialog::getExistingDirectory(myimageregistration_,
