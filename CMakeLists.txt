@@ -11,6 +11,7 @@
   set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
   set(CMAKE_CXX_FLAGS "-std=c++11")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
 
   # Widgets finds its own dependencies.
   find_package(Qt5Widgets REQUIRED)
@@ -23,7 +24,7 @@
                   loadFile.cpp imageregistration.h loadFile.h
                  itkImageToVTKImageFilter.txx itkVTKImageToImageFilter.txx itktypesandincludes.h
                  myexceptions.cpp myexceptions.h myimageclass.cpp myimageclass.h myregistration.cpp
-                 myregistration.h registrationobserver.cpp myregistrationobserver.cpp)
+                 myregistration.h registrationobserver.cpp myregistrationobserver.cpp registrationthread.cpp)
 
   set(image_registration_FORMS imageregistration.ui registrationobserver.ui)
 

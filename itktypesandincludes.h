@@ -30,6 +30,8 @@
 #include "itkBSplineTransform.h"
 #include "itkLBFGSBOptimizer.h"
 
+#include "itkBSplineTransformParametersAdaptor.h"
+#include "itkBSplineTransformInitializer.h"
 
 // Some Typedefs and Definitions for ITK
 typedef  signed short PixelType;
@@ -65,6 +67,9 @@ static const unsigned int SpaceDimension = dimension;
 static const unsigned int SplineOrder = 3;
 typedef double CoordinateRepType;
 typedef itk::BSplineTransform<CoordinateRepType,SpaceDimension,SplineOrder> TransformType;
+
+typedef itk::BSplineTransformInitializer<TransformType, ImageType> InitializerType;
+
 
 typedef itk::LBFGSBOptimizer OptimizerType;
 

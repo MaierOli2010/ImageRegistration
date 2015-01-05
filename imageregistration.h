@@ -17,6 +17,7 @@ class MyRegistration;
 class LoadFile;
 class MyImageClass;
 class registrationObserver;
+class RegistrationThread;
 
 class ImageRegistration : public QMainWindow, public Ui::mainWindow
 {
@@ -34,6 +35,8 @@ private:
     LoadFile *load_files_hdd_;
     std::vector<std::unique_ptr<MyRegistration>> registration_;
     std::unique_ptr<registrationObserver> regobs_window_;
+    std::unique_ptr<RegistrationThread> reg_thread_;
+    int selected_series_;
 
 
 private slots:
@@ -48,6 +51,8 @@ private slots:
     void SliderMovedResult(int);
     void AddMovingSeries();
     void SelectMovingSeries(int);
+    void SliderObserverMoved(int position);
+    void MovingSeriesObserverSelected(int number);
 
 };
 

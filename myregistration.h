@@ -25,6 +25,7 @@ public:
     void StartRegistration();
     void ShowResultingFit();
     void SetSlicePositionResult(int position);
+    void SetSlicePositionObserver(int position);
 
 private:
     QMessageBox msg_box_;
@@ -44,6 +45,7 @@ private:
 
 
 
+
     MetricType::Pointer metric_;
     TransformType::Pointer transform_;
     OptimizerType::Pointer optimizer_;
@@ -53,6 +55,7 @@ private:
     DifferenceFilterType::Pointer difference_;
     RescalerType::Pointer intensity_rescaler_;
     MyRegistrationObserver::Pointer observer_;
+    InitializerType::Pointer transformInitializer_;
 
     std::shared_ptr<registrationObserver> regobs_window_;
 

@@ -35,6 +35,9 @@ MyRegistration::MyRegistration(ImageRegistration *myimreg, MyImageClass* fixed_i
     movingImageCaster_ = ImageCasterType::New();
     matcher_ = MatchingFilterType::New();
     observer_->setObserverWindow(myimreg->GetObserverWindow());
+    observer_->setFixedImage(fixed_image_);
+    observer_->setMovingImage(moving_images_);
+    transformInitializer_ = InitializerType::New();
 }
 
 MyRegistration::~MyRegistration()
@@ -93,7 +96,7 @@ void MyRegistration::StartRegistration()
     TransformType::OriginType    fixedOrigin;
 
     //Default Nodes = 8
-    unsigned int numberOfGridNodesInOneDimension = 2;
+    unsigned int numberOfGridNodesInOneDimension = 8;
 
 
     for( unsigned int i=0; i< SpaceDimension; i++ )
@@ -103,7 +106,15 @@ void MyRegistration::StartRegistration()
         static_cast<double>(
         fixed_image_->GetReader()->GetOutput()->GetLargestPossibleRegion().GetSize()[i] - 1 );
     }
+
+
     meshSize.Fill( numberOfGridNodesInOneDimension - SplineOrder );
+
+    transformInitializer_->SetTransform( transform_ );
+    transformInitializer_->SetImage( fixed_image_->GetReader()->GetOutput() );
+    transformInitializer_->SetTransformDomainMeshSize( meshSize );
+    transformInitializer_->InitializeTransform();
+
     transform_->SetTransformDomainOrigin( fixedOrigin );
     transform_->SetTransformDomainPhysicalDimensions( fixedPhysicalDimensions );
     transform_->SetTransformDomainMeshSize( meshSize );
@@ -133,14 +144,41 @@ void MyRegistration::StartRegistration()
     ParametersType parameters( numberOfParameters );
     parameters.Fill( 0.0 );
 
-    //ParametersType initial_parameters( transform_->GetNumberOfParameters());
+    transform_->SetParameters( parameters );
+    registration_->SetInitialTransformParameters( transform_->GetParameters() );
+    //registration_->InPlaceOn();
+
+//    const unsigned int numberOfLevels = 3;
+
+//    RegistrationType::ShrinkFactorsArrayType shrinkFactorsPerLevel;
+//    shrinkFactorsPerLevel.SetSize( numberOfLevels );
+//    shrinkFactorsPerLevel[0] = 3;
+//    shrinkFactorsPerLevel[1] = 2;
+//    shrinkFactorsPerLevel[2] = 1;
+
+//    RegistrationType::SmoothingSigmasArrayType smoothingSigmasPerLevel;
+//    smoothingSigmasPerLevel.SetSize( numberOfLevels );
+//    smoothingSigmasPerLevel[0] = 2;
+//    smoothingSigmasPerLevel[1] = 1;
+//    smoothingSigmasPerLevel[2] = 0;
+
+//    registration_->SetNumberOfLevels( numberOfLevels );
+//    registration_->SetSmoothingSigmasLevel (smoothingSigmasPerLevel);
+//    registration_->SetShrinkFactorsPerLevel(shrinkFactorsperLevel);
+
+//    RegistrationType::TransformParametersAdaptorsContainerType adaptors;
+
+
+
     //Parameters for translation registration
+    //ParametersType initial_parameters( transform_->GetNumberOfParameters());
     //initial_parameters[0] = 0.0;
     //initial_parameters[1] = 0.0;
 
     //registration_->SetInitialTransformParameters (initial_parameters);
 
-    registration_->SetInitialTransformParameters(transform_->GetParameters());
+    //uncomment for single resolution
+    //registration_->SetInitialTransformParameters(transform_->GetParameters());
 
     //Optimizer for rigid transform
     //optimizer_->SetMaximumStepLength(2.00);
@@ -154,22 +192,25 @@ void MyRegistration::StartRegistration()
     //optimizer_->TraceOn();
     //optimizer_->SetMaximumNumberOfFunctionEvaluations( 1000 );
 
-    OptimizerType::BoundSelectionType boundSelect( numberOfParameters );
-    OptimizerType::BoundValueType upperBound( numberOfParameters );
-    OptimizerType::BoundValueType lowerBound( numberOfParameters );
+    OptimizerType::BoundSelectionType boundSelect( transform_->GetNumberOfParameters() );
+    OptimizerType::BoundValueType upperBound( transform_->GetNumberOfParameters() );
+    OptimizerType::BoundValueType lowerBound( transform_->GetNumberOfParameters() );
+
     boundSelect.Fill( 0 );
     upperBound.Fill( 0.0 );
     lowerBound.Fill( 0.0 );
+
     optimizer_->SetBoundSelection( boundSelect );
     optimizer_->SetUpperBound( upperBound );
     optimizer_->SetLowerBound( lowerBound );
-    optimizer_->SetCostFunctionConvergenceFactor( 1.e7 );
-    optimizer_->SetProjectedGradientTolerance( 1e-6 );
-    optimizer_->SetMaximumNumberOfIterations( 200 );
-    optimizer_->SetMaximumNumberOfEvaluations( 30 );
-    optimizer_->SetMaximumNumberOfCorrections( 5 );
-    optimizer_->AddObserver( itk::AnyEvent(), observer_);
-    //registration_->AddObserver( itk::IterationEvent(), observer_);
+    optimizer_->SetCostFunctionConvergenceFactor( 1.e8 ); //1e7
+    optimizer_->SetProjectedGradientTolerance( 1.e-5 ); //1e-6
+    optimizer_->SetMaximumNumberOfIterations( 500 );
+    optimizer_->SetMaximumNumberOfEvaluations( 500 );
+    optimizer_->SetMaximumNumberOfCorrections( 10 ); //should be between 3 and 20
+    optimizer_->AddObserver( itk::IterationEvent(), observer_);
+    observer_->setRegistration(registration_);
+    //registration_->AddObserver( itk::AnyEvent(), observer_);
     try
     {
         registration_->Update();
@@ -247,4 +288,9 @@ void MyRegistration::ComputeDifference()
     intensity_rescaler_->SetOutputMinimum(0);
     intensity_rescaler_->SetOutputMaximum(255);
     resampler_->SetDefaultPixelValue(1);
+}
+
+void MyRegistration::SetSlicePositionObserver(int position)
+{
+    observer_->SetSlicePositionObserver(position);
 }

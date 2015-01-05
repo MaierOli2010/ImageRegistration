@@ -135,7 +135,7 @@ void MyImageClass::GetDICOMSeries()
   if(imreg_->stackedWidget->currentIndex() == 1)
   {
     imreg_->listWidget->clear();
-    for(int i = 0; i < dcm_ids.size(); i++)
+    for(unsigned int i = 0; i < dcm_ids.size(); i++)
     {
       imreg_->listWidget->addItem(dcm_ids.at(i).c_str());
     }
@@ -143,7 +143,7 @@ void MyImageClass::GetDICOMSeries()
   else
   {
       imreg_->listWidgetMoving->clear();
-      for(int i = 0; i < dcm_ids.size(); i++)
+      for(unsigned int i = 0; i < dcm_ids.size(); i++)
       {
         imreg_->listWidgetMoving->addItem(dcm_ids.at(i).c_str());
       }

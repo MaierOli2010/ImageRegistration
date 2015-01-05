@@ -1,5 +1,5 @@
 #include "imageregistration.h"
-
+#include "ui_registrationobserver.h"
 
 #include <QFileDialog>
 #include <itkImage.h>
@@ -7,6 +7,8 @@
 #include "myimageclass.h"
 #include "loadFile.h"
 #include "registrationobserver.h"
+
+#include "registrationthread.h"
 
 #include "myregistration.h"
 
@@ -20,8 +22,11 @@ ImageRegistration::ImageRegistration(QMainWindow *parent) :
     fixed_image_ = new MyImageClass(this);
     //create Observerwindow
     regobs_window_ =  std::unique_ptr<registrationObserver> (new registrationObserver);
+    reg_thread_ = std::unique_ptr<RegistrationThread> (new RegistrationThread);
     regobs_window_->hide();
-
+    regobs_window_->ui->spinBox->setMinimum(0);
+    regobs_window_->ui->spinBox->setMaximum(0);
+    selected_series_ = 0;
 
     //Connect Signals from the UI to SLOTS
     connect(actionLoad_Files, SIGNAL(triggered()), this, SLOT(ShowFileLoad()));
@@ -37,6 +42,8 @@ ImageRegistration::ImageRegistration(QMainWindow *parent) :
     connect(hSliderResult, SIGNAL(valueChanged(int)), this, SLOT(SliderMovedResult(int)));
     connect(ButtonAddMoving, SIGNAL(clicked()), this, SLOT(AddMovingSeries()));
     connect(verticalSlider, SIGNAL(valueChanged(int)), this, SLOT(SelectMovingSeries(int)));
+    connect(regobs_window_->ui->sliderObserver, SIGNAL(valueChanged(int)), this, SLOT(SliderObserverMoved(int)));
+    connect(regobs_window_->ui->spinBox, SIGNAL(valueChanged(int)), this, SLOT(MovingSeriesObserverSelected(int)));
 
 }
 
@@ -135,6 +142,7 @@ void ImageRegistration::ShowComputing()
     regobs_window_->show();
     verticalSlider->setMinimum(0);
     verticalSlider->setMaximum(moving_image_vec_.size()-1);
+    regobs_window_->ui->spinBox->setMaximum(moving_image_vec_.size()-1);
     try
     {
       moving_image_vec_.back()->LoadDICOM();
@@ -179,7 +187,7 @@ void ImageRegistration::SaveFiles()
     load_files_hdd_->SaveDirectoryPath();
     if(load_files_hdd_->GetSavePath().isEmpty() == false)
     {
-        for(int i = 0; i < moving_image_vec_.size(); ++i)
+        for(unsigned int i = 0; i < moving_image_vec_.size(); ++i)
         {
           registration_[i]->SaveDICOMSeries(load_files_hdd_->GetSavePath());
         }
@@ -192,7 +200,7 @@ void ImageRegistration::StartRegistration()
 
     if(registration_.empty())
     {
-        for(int i = 0; i < moving_image_vec_.size(); ++i)
+        for(unsigned int i = 0; i < moving_image_vec_.size(); ++i)
         {
             registration_.push_back(std::unique_ptr<MyRegistration>(new MyRegistration(this, fixed_image_, &moving_image_vec_[i])));
         }
@@ -200,15 +208,13 @@ void ImageRegistration::StartRegistration()
     else
     {
       registration_.clear();
-      for(int i = 0; i < moving_image_vec_.size(); ++i)
+      for(unsigned int i = 0; i < moving_image_vec_.size(); ++i)
       {
           registration_.push_back(std::unique_ptr<MyRegistration>(new MyRegistration(this, fixed_image_, &moving_image_vec_[i])));
       }
     }
-    for(int i = 0; i < moving_image_vec_.size(); ++i)
-    {
-      registration_[i]->StartRegistration();
-    }
+    reg_thread_->setRegistration(&registration_);
+    reg_thread_->start();
 }
 //Shows the Resulting fit for the registrated Series. At the moment only the first series is displayed because
 //there is a bug when visualizing more than 1 series. Still more work needed here
@@ -226,4 +232,15 @@ void ImageRegistration::SelectMovingSeries(int position)
 std::unique_ptr<registrationObserver>* ImageRegistration::GetObserverWindow()
 {
     return &regobs_window_;
+}
+//Changes the current Observed Image depending on slider position
+void ImageRegistration::SliderObserverMoved(int position)
+
+{
+    registration_[selected_series_]->SetSlicePositionObserver(position);
+}
+
+void ImageRegistration::MovingSeriesObserverSelected(int number)
+{
+    selected_series_ = number;
 }
