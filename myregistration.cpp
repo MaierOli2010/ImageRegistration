@@ -38,6 +38,8 @@ MyRegistration::MyRegistration(ImageRegistration *myimreg, MyImageClass* fixed_i
     observer_->setFixedImage(fixed_image_);
     observer_->setMovingImage(moving_images_);
     transformInitializer_ = InitializerType::New();
+    gdcmIO_ = ImageIOType::New();
+    namesGenerator_ = NamesGeneratorType::New();
 }
 
 MyRegistration::~MyRegistration()
@@ -203,11 +205,11 @@ void MyRegistration::StartRegistration()
     optimizer_->SetBoundSelection( boundSelect );
     optimizer_->SetUpperBound( upperBound );
     optimizer_->SetLowerBound( lowerBound );
-    optimizer_->SetCostFunctionConvergenceFactor( 1.e8 ); //1e7
-    optimizer_->SetProjectedGradientTolerance( 1.e-5 ); //1e-6
+    optimizer_->SetCostFunctionConvergenceFactor( 1.e7 ); //1e7
+    optimizer_->SetProjectedGradientTolerance( 1.e-6 ); //1e-6
     optimizer_->SetMaximumNumberOfIterations( 500 );
     optimizer_->SetMaximumNumberOfEvaluations( 500 );
-    optimizer_->SetMaximumNumberOfCorrections( 10 ); //should be between 3 and 20
+    optimizer_->SetMaximumNumberOfCorrections( 20 ); //should be between 3 and 20
     optimizer_->AddObserver( itk::IterationEvent(), observer_);
     observer_->setRegistration(registration_);
     //registration_->AddObserver( itk::AnyEvent(), observer_);
