@@ -10,13 +10,27 @@
   # to always look for includes there:
   set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-  set(CMAKE_CXX_FLAGS "-std=c++11")
+  #set(CMAKE_CXX_FLAGS "-std=c++11")
+  set(CMAKE_CXX_FLAGS "-std=c++0x -fpermissive")
+
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
 
+  ##### QT 5 ###########
   # Widgets finds its own dependencies.
-  find_package(Qt5Widgets REQUIRED)
-  find_package(Qt5Core REQUIRED)
-  find_package(Qt5Gui REQUIRED)
+  #find_package(Qt5Widgets REQUIRED)
+  #find_package(Qt5Core REQUIRED)
+  #find_package(Qt5Gui REQUIRED)
+  #find_package(Qt4Widgets REQUIRED)
+  #find_package(Qt4Core REQUIRED)
+  #find_package(Qt4Gui REQUIRED)
+
+  ##### QT 4 ###########
+  find_package(Qt4 REQUIRED QtCore QtGui)
+  set(MY_QT_VERSION 4)
+  MESSAGE(MyQtVersion: ${MY_QT_VERSION})
+  add_definitions(-DMY_QT_VERSION=${MY_QT_VERSION})
+  include_directories(${QT_INCLUDES})
+
   find_package(VTK REQUIRED)
   find_package(ITK REQUIRED)
 
@@ -28,7 +42,8 @@
 
   set(image_registration_FORMS imageregistration.ui registrationobserver.ui)
 
-  QT5_WRAP_UI(imreg_FORMS_HEADERS ${image_registration_FORMS})
+  #QT5_WRAP_UI(imreg_FORMS_HEADERS ${image_registration_FORMS})
+  QT4_WRAP_UI(imreg_FORMS_HEADERS ${image_registration_FORMS})
 
   include(${ITK_USE_FILE})
   include(${VTK_USE_FILE})
@@ -38,5 +53,9 @@
 
   add_executable(${imreg_SOURCES})
 
-  target_link_libraries(imageregistration Qt5::Widgets Qt5::Core Qt5::Gui)
+  #target_link_libraries(imageregistration Qt5::Widgets Qt5::Core Qt5::Gui)
+  target_link_libraries(imageregistration  ${QT_LIBRARIES})
   target_link_libraries(imageregistration ${ITK_LIBRARIES} ${VTK_LIBRARIES})
+
+
+

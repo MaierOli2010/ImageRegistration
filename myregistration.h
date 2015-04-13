@@ -15,12 +15,22 @@ class MyImageClass;
 class ImageRegistration;
 class registrationObserver;
 
+/**
+ * @brief The MyRegistration class
+ * Dokumentation was die Klasse denn so alles macht.
+ *
+ */
 class MyRegistration
 {
 public:
     explicit MyRegistration(ImageRegistration *myimreg, MyImageClass* fixed_image,
                             std::unique_ptr<MyImageClass> *moving_images);
     ~MyRegistration();
+    /**
+     * @brief SaveDICOMSeries
+     * This method saves .. but also takes care that, ...
+     * @param save_path Path where the dicom...
+     */
     void SaveDICOMSeries(QString save_path);
     void StartRegistration();
     void ShowResultingFit();
@@ -44,9 +54,10 @@ private:
     MatchingFilterType::Pointer matcher_;
 
 
-
-
     MetricType::Pointer metric_;
+    /**
+     * @brief transform_ The ITK Transform type defined in itktypesandincludes.h
+     */
     TransformType::Pointer transform_;
     OptimizerType::Pointer optimizer_;
     InterpolatorType::Pointer interpolator_;

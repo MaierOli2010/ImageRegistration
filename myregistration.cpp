@@ -18,7 +18,8 @@ MyRegistration::MyRegistration(ImageRegistration *myimreg, MyImageClass* fixed_i
                                std::unique_ptr<MyImageClass>* moving_images):
     imreg_(myimreg),
     fixed_image_(fixed_image),
-    moving_images_(moving_images)
+    moving_images_(moving_images),
+    registration_(RegistrationType::New())
 {
     imageViewerDCMSeriesX_result_ = vtkSmartPointer<vtkImageViewer2>::New();
 
@@ -26,7 +27,7 @@ MyRegistration::MyRegistration(ImageRegistration *myimreg, MyImageClass* fixed_i
     transform_ = TransformType::New();
     optimizer_ = OptimizerType::New();
     interpolator_ = InterpolatorType::New();
-    registration_ = RegistrationType::New();
+    //registration_ = RegistrationType::New();
     resampler_ = ResampleFilterType::New();
     difference_ = DifferenceFilterType::New();
     intensity_rescaler_ = RescalerType::New();
@@ -98,7 +99,7 @@ void MyRegistration::StartRegistration()
     TransformType::OriginType    fixedOrigin;
 
     //Default Nodes = 8
-    unsigned int numberOfGridNodesInOneDimension = 8;
+    unsigned int numberOfGridNodesInOneDimension = 4;
 
 
     for( unsigned int i=0; i< SpaceDimension; i++ )
@@ -205,11 +206,11 @@ void MyRegistration::StartRegistration()
     optimizer_->SetBoundSelection( boundSelect );
     optimizer_->SetUpperBound( upperBound );
     optimizer_->SetLowerBound( lowerBound );
-    optimizer_->SetCostFunctionConvergenceFactor( 1.e7 ); //1e7
-    optimizer_->SetProjectedGradientTolerance( 1.e-6 ); //1e-6
+    optimizer_->SetCostFunctionConvergenceFactor( 1.e2 ); //1e7
+    optimizer_->SetProjectedGradientTolerance( 1.e-1 ); //1e-6
     optimizer_->SetMaximumNumberOfIterations( 500 );
     optimizer_->SetMaximumNumberOfEvaluations( 500 );
-    optimizer_->SetMaximumNumberOfCorrections( 20 ); //should be between 3 and 20
+    optimizer_->SetMaximumNumberOfCorrections( 3 ); //should be between 3 and 20
     optimizer_->AddObserver( itk::IterationEvent(), observer_);
     observer_->setRegistration(registration_);
     //registration_->AddObserver( itk::AnyEvent(), observer_);
