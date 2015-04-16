@@ -1,20 +1,27 @@
 #ifndef DICOMTYPEDEFS_H
 #define DICOMTYPEDEFS_H
 
+/*!
+ * \brief itktypesandincludes This header contains the importen typedefs and includes for the
+ * itk registration process. If you want to switch the registration method or transforms
+ * start here.
+*/
+
 #include <itkImage.h>
 #include <itkGDCMImageIO.h>
 #include <itkGDCMSeriesFileNames.h>
 #include <itkImageSeriesReader.h>
-#include <itkImageRegistrationMethod.h>
+#include <itkImageRegistrationMethodv4.h>
 
 //using non rigid transform instead of Translation Transform
-//#include <itkTranslationTransform.h>
+#include <itkTranslationTransform.h>
 
 
-#include <itkMeanSquaresImageToImageMetric.h>
+//#include <itkMeanSquaresImageToImageMetric.h>
+#include <itkMattesMutualInformationImageToImageMetricv4.h>
 
 // Using LBFGSOptimizer instead
-//#include <itkRegularStepGradientDescentOptimizer.h>
+#include <itkRegularStepGradientDescentOptimizerv4.h>
 
 
 #include <itkResampleImageFilter.h>
@@ -26,17 +33,17 @@
 #include <itkCastImageFilter.h>
 #include <itkHistogramMatchingImageFilter.h>
 
-
+#include <itkCompositeTransform.h>
 #include "itkBSplineTransform.h"
-#include "itkLBFGSBOptimizer.h"
+#include "itkLBFGSBOptimizerv4.h"
 
 #include "itkBSplineTransformParametersAdaptor.h"
 #include "itkBSplineTransformInitializer.h"
 
 // Some Typedefs and Definitions for ITK
-typedef  signed short PixelType;
+typedef double PixelType;
 static const unsigned int dimension = 3;
-typedef float InternalPixelType;
+typedef double InternalPixelType;
 typedef itk::Image< InternalPixelType, dimension> InternalImageType;
 
 typedef itk::Image<PixelType, dimension> ImageType;
@@ -49,17 +56,9 @@ typedef itk::CastImageFilter <ImageType, InternalImageType> ImageCasterType;
 typedef itk::HistogramMatchingImageFilter<InternalImageType, InternalImageType> MatchingFilterType;
 
 
-//typedef itk::TranslationTransform<double, dimension> TransformType;
+typedef itk::TranslationTransform<InternalPixelType, dimension> TransformType_1st;
 
-//typedef itk::RegularStepGradientDescentOptimizer OptimizerType;
-
-
-typedef itk::MeanSquaresImageToImageMetric<InternalImageType, InternalImageType> MetricType;
-typedef itk::LinearInterpolateImageFunction< InternalImageType, double> InterpolatorType;
-typedef itk::ImageRegistrationMethod<InternalImageType, InternalImageType> RegistrationType;
-typedef itk::ResampleImageFilter<ImageType, InternalImageType> ResampleFilterType;
-typedef itk::SubtractImageFilter<ImageType,InternalImageType,ImageType> DifferenceFilterType;
-typedef itk::RescaleIntensityImageFilter<ImageType,ImageType> RescalerType;
+typedef itk::RegularStepGradientDescentOptimizerv4<InternalPixelType> OptimizerType_1st;
 
 //non-rigid Transform typedefs
 static const unsigned int SpaceDimension = dimension;
@@ -70,7 +69,19 @@ typedef itk::BSplineTransform<CoordinateRepType,SpaceDimension,SplineOrder> Tran
 
 typedef itk::BSplineTransformInitializer<TransformType, ImageType> InitializerType;
 
+//typedef itk::MeanSquaresImageToImageMetric<InternalImageType, InternalImageType> MetricType;
+typedef itk::MattesMutualInformationImageToImageMetricv4<ImageType, InternalImageType> MetricType;
+typedef itk::LinearInterpolateImageFunction< InternalImageType, double> InterpolatorType;
+typedef itk::ImageRegistrationMethodv4<ImageType, InternalImageType, TransformType> RegistrationType;
+typedef itk::ImageRegistrationMethodv4<ImageType, InternalImageType, TransformType_1st> TRegistrationType;
+typedef itk::ResampleImageFilter<ImageType, InternalImageType> ResampleFilterType;
+typedef itk::SubtractImageFilter<ImageType,InternalImageType,ImageType> DifferenceFilterType;
+typedef itk::RescaleIntensityImageFilter<ImageType,ImageType> RescalerType;
 
-typedef itk::LBFGSBOptimizer OptimizerType;
+
+typedef itk::CompositeTransform<InternalPixelType, dimension> CompositeTransformType;
+
+
+typedef itk::LBFGSBOptimizerv4 OptimizerType;
 
 #endif // DICOMTYPEDEFS_H

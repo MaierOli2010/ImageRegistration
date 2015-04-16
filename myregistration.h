@@ -10,22 +10,62 @@
 
 #include "itktypesandincludes.h"
 #include "myregistrationobserver.h"
+#include <itkNumericSeriesFileNames.h>
 
 class MyImageClass;
 class ImageRegistration;
 class registrationObserver;
-
+/*!
+ * \brief The MyRegistration class This class takes care of the registration process.
+ * In the current build a multistage multiresolution registration is performed. The initial registration
+ * uses a translation transform with low resolution for initial registration of wider misalignements.
+ * Afterwards a non-rigid BSpline Transformation combined with a LBFGSB Optimizer is used to get the final
+ * result.
+ */
 class MyRegistration
 {
 public:
+    /*!
+     * \brief MyRegistration constructor
+     * \param myimreg Pointer to the main object
+     * \param fixed_image Pointer to the fixed series
+     * \param moving_images Pointer to the moving series
+     */
     explicit MyRegistration(ImageRegistration *myimreg, MyImageClass* fixed_image,
                             std::unique_ptr<MyImageClass> *moving_images);
     ~MyRegistration();
-    void SaveDICOMSeries(QString save_path);
+    /*!
+     * \brief SaveDICOMSeries Saves the registered Series.
+     * \param save_path
+     * \param subfolder
+     */
+    void SaveDICOMSeries(QString save_path, std::string subfolder);
+    /*!
+     * \brief StartRegistration Starts the registration process.
+     * This function contains all the itk code, which is need to register the images.
+     * First, an intensity rescaling is performed to minimize the difference and
+     * enhance the registration process. Second is a translation registration to account
+     * for possible shifts between the series and minimize the difference to speed up
+     * the non rigid transform which follow last. The output of the last stage is passed
+     * to a resample image filter, which uses the last(best) transform parameter from
+     * the non rigid transform to transform the moving series.
+     */
     void StartRegistration();
+    /*!
+     * \brief Displays the final registration result using a difference image.
+     */
     void ShowResultingFit();
+    /*!
+     * \brief SetSlicePosition Sets the image to be displayed in the UI.
+     * \param position Number of Image to be displayed (Slice).
+     */
     void SetSlicePositionResult(int position);
+    /*!
+     * \brief SetSlicePosition Sets the image to be displayed in the Observer UI.
+     * \param position Number of Image to be displayed (Slice).
+     */
     void SetSlicePositionObserver(int position);
+
 
 private:
     QMessageBox msg_box_;
@@ -37,15 +77,17 @@ private:
 
     FilterType::Pointer connector_result_;
     itk::GDCMImageIO::Pointer gdcmIO_;
-    itk::GDCMSeriesFileNames::Pointer namesGenerator_;
     vtkSmartPointer<vtkImageViewer2> imageViewerDCMSeriesX_result_;
     ImageCasterType::Pointer fixedImageCaster_;
     ImageCasterType::Pointer movingImageCaster_;
     MatchingFilterType::Pointer matcher_;
+    MetricType::Pointer Tmetric_;
 
 
 
 
+    TransformType_1st::Pointer Ttransform_;
+    OptimizerType_1st::Pointer Toptimizer_;
     MetricType::Pointer metric_;
     TransformType::Pointer transform_;
     OptimizerType::Pointer optimizer_;
@@ -56,6 +98,8 @@ private:
     RescalerType::Pointer intensity_rescaler_;
     MyRegistrationObserver::Pointer observer_;
     InitializerType::Pointer transformInitializer_;
+    CompositeTransformType::Pointer compositeTransform_;
+    TRegistrationType::Pointer Tregistration_;
 
     std::shared_ptr<registrationObserver> regobs_window_;
 

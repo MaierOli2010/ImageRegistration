@@ -32,13 +32,16 @@ public:
 
     //Const interface ensures that all options invoked on the optimizer are read-only
     typedef const OptimizerType* OptimizerPointer;
+    typedef const OptimizerType_1st* ToptimizerPointer;
     typedef const RegistrationType* RegistrationTypePointer;
+    typedef const TRegistrationType* TRegistrationTypePointer;
     void Execute(itk::Object *caller, const itk::EventObject &event);
     void Execute(const itk::Object *object, const itk::EventObject &event);
 
     void SetSlicePositionObserver(int position);
     void setObserverWindow(std::unique_ptr<registrationObserver> *regobs);
     void setRegistration(RegistrationTypePointer registration);
+    void setRegistration(TRegistrationTypePointer registration);
 private:
     std::unique_ptr<registrationObserver>* regobs_;
     MyImageClass* fixed_image_;
@@ -46,11 +49,13 @@ private:
     FilterType::Pointer connector_result_;
     QMessageBox msg_box_;
     const vtkSmartPointer<vtkImageViewer2> imageViewerDCMSeriesX_result_ = vtkSmartPointer<vtkImageViewer2>::New();
-    RegistrationTypePointer registration_;
+    RegistrationTypePointer registration_ = NULL;
+    TRegistrationTypePointer Tregistration_ =  NULL;
 
     const DifferenceFilterType::Pointer difference_ = DifferenceFilterType::New();
     const ResampleFilterType::Pointer resampler_ = ResampleFilterType::New();
     const RescalerType::Pointer rescaler_ = RescalerType::New();
+
 
     void ComputeDifference();
     void ShowResultingFit();

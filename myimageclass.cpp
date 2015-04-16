@@ -6,23 +6,7 @@
 
 #include <itkCastImageFilter.h>
 
-
-// Includes from a Sample... Still to figure out why
-// they where included here...
-
-//#include <vtkPolyDataMapper.h>
-//#include <vtkActor.h>
-//#include <vtkRenderer.h>
-//#include <vtkRenderWindow.h>
-//#include <vtkDICOMImageReader.h>
-//#include <vtkObjectFactory.h>
-//#include <vtkRenderWindowInteractor.h>
-//#include <vtkInteractorStyleImage.h>
-//#include <vtkActor2D.h>
-//#include <vtkTextProperty.h>
-//#include <vtkTextMapper.h>
-
-
+#include <itkNumericSeriesFileNames.h>
 
 
 MyImageClass::MyImageClass(ImageRegistration *myimreg):
@@ -39,7 +23,7 @@ void MyImageClass::LoadDICOM()
 {
   try
   {
-    //check if a Fixed and Moving Series was selected
+    //check if a Fixed or Moving Series was selected
     if(imreg_->listWidget->currentIndex().isValid() == false &&
             imreg_->listWidgetMoving->currentIndex().isValid() == false)
     {
@@ -163,4 +147,76 @@ void MyImageClass::RedrawDICOMImg()
 ReaderType::Pointer MyImageClass::GetReader()
 {
     return reader_;
+}
+itk::GDCMSeriesFileNames::Pointer MyImageClass::GetFileNames()
+{
+    return namesGenerator_;
+}
+
+void MyImageClass::SaveDICOMSeries(QString save_path, std::string subfolder)
+{
+    std::string output_directory = save_path.toStdString();
+    output_directory +=subfolder;
+
+    itksys::SystemTools::MakeDirectory( output_directory.c_str() );
+
+    typedef signed short OutputPixelType;
+    const unsigned int output_pixel_dimension = 2;
+
+    typedef itk::Image < OutputPixelType, output_pixel_dimension > Image2Dtype;
+    typedef itk::CastImageFilter<InternalImageType, ImageType> CastFilterType;
+
+    typedef itk::ImageSeriesWriter < ImageType, Image2Dtype> SeriesWriterType;
+
+
+    CastFilterType::Pointer caster = CastFilterType::New();
+    SeriesWriterType::Pointer series_writer = SeriesWriterType::New();
+
+    typedef itk::NumericSeriesFileNames NumericNamesGeneratorType;
+
+    NumericNamesGeneratorType::Pointer namesGenerator = NumericNamesGeneratorType::New();
+
+    itk::MetaDataDictionary &dict = gdcmIO_->GetMetaDataDictionary();
+    std::string tagkey,value;
+    tagkey = "0008|0060";
+    value = "MR";
+    itk::EncapsulateMetaData<std::string>(dict,tagkey,value);
+    tagkey = "0008|0008";
+    value = "DERIVED\\SECONDARY";
+    itk::EncapsulateMetaData<std::string>(dict,tagkey,value);
+    tagkey = "0008|0064";
+    value = "DV";
+    itk::EncapsulateMetaData<std::string>(dict,tagkey,value);
+
+    caster->SetInput(reader_->GetOutput());
+    series_writer->SetInput( caster->GetOutput());
+    series_writer->SetImageIO(gdcmIO_);
+
+    ImageType::RegionType region = reader_->GetOutput()->GetLargestPossibleRegion();
+    ImageType::IndexType start = region.GetIndex();
+    ImageType::SizeType size = region.GetSize();
+
+    std::string format = output_directory;
+    format += "/image%03d.dcm";
+
+    namesGenerator->SetSeriesFormat(format.c_str());
+
+    namesGenerator->SetStartIndex(start[2]);
+    namesGenerator->SetEndIndex(start[2]+size[2]-1);
+    namesGenerator->SetIncrementIndex(1);
+
+    series_writer->SetFileNames (namesGenerator->GetFileNames());
+
+    series_writer->SetMetaDataDictionaryArray(reader_->GetMetaDataDictionaryArray());
+
+    try
+    {
+        series_writer->Update();
+    }
+    catch( itk::ExceptionObject &excp)
+    {
+        msg_box_.setText(excp.GetDescription());
+        msg_box_.exec();
+    }
+
 }

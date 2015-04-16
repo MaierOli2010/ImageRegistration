@@ -2,7 +2,7 @@
 #include "ui_registrationobserver.h"
 
 #include <QFileDialog>
-#include <itkImage.h>
+//#include <itkImage.h>
 
 #include "myimageclass.h"
 #include "loadFile.h"
@@ -187,9 +187,16 @@ void ImageRegistration::SaveFiles()
     load_files_hdd_->SaveDirectoryPath();
     if(load_files_hdd_->GetSavePath().isEmpty() == false)
     {
+        std::string subfolder = "/fixed_series";
+        fixed_image_->SaveDICOMSeries(load_files_hdd_->GetSavePath(), subfolder);
         for(unsigned int i = 0; i < moving_image_vec_.size(); ++i)
         {
-          registration_[i]->SaveDICOMSeries(load_files_hdd_->GetSavePath());
+          subfolder = "/moving_series_";
+          subfolder += std::to_string(i);
+          moving_image_vec_[i]->SaveDICOMSeries(load_files_hdd_->GetSavePath(),subfolder);
+          subfolder = "/registered_series_";
+          subfolder += std::to_string(i);
+          registration_[i]->SaveDICOMSeries(load_files_hdd_->GetSavePath(),subfolder);
         }
     }
 }

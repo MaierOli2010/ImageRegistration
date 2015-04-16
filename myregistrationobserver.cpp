@@ -19,15 +19,34 @@ void MyRegistrationObserver::Execute(itk::Object *caller, const itk::EventObject
 // window.
 void MyRegistrationObserver::Execute(const itk::Object *object, const itk::EventObject &event)
 {
-    OptimizerPointer optimizer = dynamic_cast< OptimizerPointer>( object );
-    if ( !(typeid( event ) == typeid( itk::IterationEvent )))
+    if(Tregistration_!=NULL && registration_!=NULL)
     {
-        return;
+      OptimizerPointer optimizer = dynamic_cast< OptimizerPointer>( object );
+      if ( !(typeid( event ) == typeid( itk::IterationEvent )))
+      {
+          return;
+      }
+      (*regobs_)->show();
+      resampler_->SetInput((*moving_image_)->GetReader()->GetOutput());
+      CompositeTransformType::Pointer compositeTransform = CompositeTransformType::New();
+      compositeTransform->AddTransform(Tregistration_->GetModifiableTransform());
+      compositeTransform->AddTransform(registration_->GetModifiableTransform());
+      resampler_->SetTransform(compositeTransform);
+      (*regobs_)->ui->lcdNumber->display(static_cast<int>(optimizer->GetCurrentIteration()));
     }
-    (*regobs_)->show();
-    (*regobs_)->ui->lcdNumber->display(static_cast<int>(optimizer->GetCurrentIteration()));
-    resampler_->SetInput((*moving_image_)->GetReader()->GetOutput());
-    resampler_->SetTransform(registration_->GetOutput()->Get());
+    else
+    {
+      ToptimizerPointer optimizer = dynamic_cast< ToptimizerPointer>( object );
+      if ( !(typeid( event ) == typeid( itk::IterationEvent )))
+      {
+          return;
+      }
+      (*regobs_)->show();
+      resampler_->SetInput((*moving_image_)->GetReader()->GetOutput());
+      resampler_->SetTransform(Tregistration_->GetOutput()->Get());
+      (*regobs_)->ui->lcdNumber->display(static_cast<int>(optimizer->GetCurrentIteration()));
+    }
+
     resampler_->SetSize(fixed_image_->GetReader()->GetOutput()->GetLargestPossibleRegion().GetSize());
     resampler_->SetOutputOrigin(fixed_image_->GetReader()->GetOutput()->GetOrigin());
     resampler_->SetOutputSpacing(fixed_image_->GetReader()->GetOutput()->GetSpacing());
@@ -106,6 +125,11 @@ void MyRegistrationObserver::ShowResultingFit()
 void MyRegistrationObserver::setRegistration(RegistrationTypePointer registration)
 {
     registration_ = registration;
+}
+
+void MyRegistrationObserver::setRegistration(TRegistrationTypePointer registration)
+{
+    Tregistration_ = registration;
 }
 
 void MyRegistrationObserver::SetSlicePositionObserver(int position)
