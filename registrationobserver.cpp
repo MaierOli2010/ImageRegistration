@@ -2,15 +2,15 @@
 #include "ui_registrationobserver.h"
 
 
-registrationObserver::registrationObserver(QWidget *parent) :
+RegistrationObserver::RegistrationObserver(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::registrationObserver)
+    ui(new Ui::RegistrationObserver)
 {
     ui->setupUi(this);
 
 }
 
-registrationObserver::~registrationObserver()
+RegistrationObserver::~RegistrationObserver()
 {
     delete ui;
 }

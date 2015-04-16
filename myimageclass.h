@@ -15,7 +15,7 @@
 
 class ImageRegistration;
 /*!
- * \brief The MyImageClass class.
+ * \brief Loads,saves and displays a DICOM series and keeps it in memory for processing.
  * This class is the container for all image series to read. It takes care of loading the series into the memory and provides
  * a function to display the images in the UI. It also provides a function to save the loaded series to a directory.
  * In order to display the itk-Images they have to be connected to a VTK-image stream which can be displayed in a QVTK-Widget
@@ -25,42 +25,42 @@ class MyImageClass
 {
 public:
     /*!
-     * \brief MyImageClass Constructor.
-     * \param myimreg Pointer to the main registration object.
+     * \brief constructor.
+     * \param myimreg pointer to the main imageregistration object.
      */
     explicit MyImageClass(ImageRegistration *myimreg);
         ~MyImageClass();
     /*!
-         * \brief SetFileName Specify the File Names to be read.
+         * \brief specifies the file fames to be read.
          * \param mypath Path to the files.
          * \param myfiles List of all files to be read.
          */
         void SetFileName(QString mypath, QStringList myfiles);
         /*!
-         * \brief LoadDICOM Loads all files into the memory and displays them in the GUI.
+         * \brief loads all files into the memory and displays them in the GUI.
          */
         void LoadDICOM();
         /*!
-         * \brief SetSlicePosition Sets the image to be displayed in the UI.
-         * \param position Number of Image to be displayed (Slice).
+         * \brief sets the image to be displayed in the UI.
+         * \param position number of image to be displayed (slice).
          */
         void SetSlicePosition(int position);
         /*!
-         * \brief GetDICOMSeries Identifies all Dicom Series in the specified folder and display the
+         * \brief identifies all DICOM series in the specified folder and displays the
          * series ID in the GUI.
-         * The folder is specified by SetFileName.
+         * The folder is specified by the SetFileName function.
          */
         void GetDICOMSeries();
         /*!
-         * \brief RedrawDICOMImg Triggers the rendering process when a series is selected to be displayed.
+         * \brief triggers the rendering process when a series is selected to be displayed.
          */
         void RedrawDICOMImg();
         ReaderType::Pointer GetReader();
         itk::GDCMSeriesFileNames::Pointer GetFileNames();
         /*!
-         * \brief SaveDICOMSeries Saves the stored series into the folder specified by save_path/subfolder
-         * \param save_path The path to the main output folder.
-         * \param subfolder The subfolder where images are saved.
+         * \brief saves the stored series into the folder specified by save_path/subfolder
+         * \param save_path path to the main output folder.
+         * \param subfolder subfolder where images are saved.
          */
         void SaveDICOMSeries(QString save_path, std::string subfolder);
 

@@ -61,7 +61,7 @@ MyRegistrationObserver::~MyRegistrationObserver()
 
 }
 
-void MyRegistrationObserver::setObserverWindow(std::unique_ptr<registrationObserver>* regobs)
+void MyRegistrationObserver::setObserverWindow(std::unique_ptr<RegistrationObserver> *regobs)
 {
     regobs_ = regobs;
 }

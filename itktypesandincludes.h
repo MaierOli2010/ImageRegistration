@@ -2,7 +2,7 @@
 #define DICOMTYPEDEFS_H
 
 /*!
- * \brief itktypesandincludes This header contains the importen typedefs and includes for the
+ * \file itktypesandincludes.h This header contains the importen typedefs and includes for the
  * itk registration process. If you want to switch the registration method or transforms
  * start here.
 */
@@ -56,9 +56,9 @@ typedef itk::CastImageFilter <ImageType, InternalImageType> ImageCasterType;
 typedef itk::HistogramMatchingImageFilter<InternalImageType, InternalImageType> MatchingFilterType;
 
 
-typedef itk::TranslationTransform<InternalPixelType, dimension> TransformType_1st;
+typedef itk::TranslationTransform<InternalPixelType, dimension> TTransformType;
 
-typedef itk::RegularStepGradientDescentOptimizerv4<InternalPixelType> OptimizerType_1st;
+typedef itk::RegularStepGradientDescentOptimizerv4<InternalPixelType> TOptimizerType;
 
 //non-rigid Transform typedefs
 static const unsigned int SpaceDimension = dimension;
@@ -73,7 +73,7 @@ typedef itk::BSplineTransformInitializer<TransformType, ImageType> InitializerTy
 typedef itk::MattesMutualInformationImageToImageMetricv4<ImageType, InternalImageType> MetricType;
 typedef itk::LinearInterpolateImageFunction< InternalImageType, double> InterpolatorType;
 typedef itk::ImageRegistrationMethodv4<ImageType, InternalImageType, TransformType> RegistrationType;
-typedef itk::ImageRegistrationMethodv4<ImageType, InternalImageType, TransformType_1st> TRegistrationType;
+typedef itk::ImageRegistrationMethodv4<ImageType, InternalImageType, TTransformType> TRegistrationType;
 typedef itk::ResampleImageFilter<ImageType, InternalImageType> ResampleFilterType;
 typedef itk::SubtractImageFilter<ImageType,InternalImageType,ImageType> DifferenceFilterType;
 typedef itk::RescaleIntensityImageFilter<ImageType,ImageType> RescalerType;

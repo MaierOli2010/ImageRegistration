@@ -41,8 +41,8 @@ MyRegistration::MyRegistration(ImageRegistration *myimreg, MyImageClass* fixed_i
     observer_->setMovingImage(moving_images_);
     transformInitializer_ = InitializerType::New();
     gdcmIO_ = ImageIOType::New();
-    Ttransform_ = TransformType_1st::New();
-    Toptimizer_ = OptimizerType_1st::New();
+    Ttransform_ = TTransformType::New();
+    Toptimizer_ = TOptimizerType::New();
     compositeTransform_ = CompositeTransformType::New();
     Tregistration_ = TRegistrationType::New();
     Tmetric_ = MetricType::New();
@@ -141,7 +141,7 @@ void MyRegistration::StartRegistration()
     Tmetric_->SetUseFixedImageGradientFilter(false);
     Tmetric_->SetUseFixedSampledPointSet(false);
 
-    typedef OptimizerType_1st::ParametersType TParametersType;
+    typedef TOptimizerType::ParametersType TParametersType;
     TParametersType TinitialParameters(Ttransform_->GetNumberOfParameters());
 
     TinitialParameters[0] = 0;

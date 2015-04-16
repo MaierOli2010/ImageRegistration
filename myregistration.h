@@ -16,32 +16,32 @@ class MyImageClass;
 class ImageRegistration;
 class registrationObserver;
 /*!
- * \brief The MyRegistration class This class takes care of the registration process.
+ * \brief Takes care of the registration process and saves the final result.
  * In the current build a multistage multiresolution registration is performed. The initial registration
- * uses a translation transform with low resolution for initial registration of wider misalignements.
- * Afterwards a non-rigid BSpline Transformation combined with a LBFGSB Optimizer is used to get the final
+ * uses a translation transform with low resolution for initial correction of wider misalignements.
+ * Afterwards a non-rigid BSpline transformation combined with a LBFGSB optimizer is used to get the final
  * result.
  */
 class MyRegistration
 {
 public:
     /*!
-     * \brief MyRegistration constructor
-     * \param myimreg Pointer to the main object
-     * \param fixed_image Pointer to the fixed series
-     * \param moving_images Pointer to the moving series
+     * \brief constructor
+     * \param myimreg pointer to the main imageregistration object
+     * \param fixed_image pointer to the fixed series
+     * \param moving_images pointer to the moving series
      */
     explicit MyRegistration(ImageRegistration *myimreg, MyImageClass* fixed_image,
                             std::unique_ptr<MyImageClass> *moving_images);
     ~MyRegistration();
     /*!
-     * \brief SaveDICOMSeries Saves the registered Series.
-     * \param save_path
-     * \param subfolder
+     * \brief saves the registered series.
+     * \param save_path path to the main output folder.
+     * \param subfolder subfolder where images are saved.
      */
     void SaveDICOMSeries(QString save_path, std::string subfolder);
     /*!
-     * \brief StartRegistration Starts the registration process.
+     * \brief starts the registration process.
      * This function contains all the itk code, which is need to register the images.
      * First, an intensity rescaling is performed to minimize the difference and
      * enhance the registration process. Second is a translation registration to account
@@ -52,17 +52,17 @@ public:
      */
     void StartRegistration();
     /*!
-     * \brief Displays the final registration result using a difference image.
+     * \brief sisplays the final registration result using a difference image.
      */
     void ShowResultingFit();
     /*!
-     * \brief SetSlicePosition Sets the image to be displayed in the UI.
-     * \param position Number of Image to be displayed (Slice).
+     * \brief sets the image to be displayed in the UI.
+     * \param position number of image to be displayed (Slice).
      */
     void SetSlicePositionResult(int position);
     /*!
-     * \brief SetSlicePosition Sets the image to be displayed in the Observer UI.
-     * \param position Number of Image to be displayed (Slice).
+     * \brief sets the image to be displayed in the observer UI.
+     * \param position number of image to be displayed (Slice).
      */
     void SetSlicePositionObserver(int position);
 
@@ -86,8 +86,8 @@ private:
 
 
 
-    TransformType_1st::Pointer Ttransform_;
-    OptimizerType_1st::Pointer Toptimizer_;
+    TTransformType::Pointer Ttransform_;
+    TOptimizerType::Pointer Toptimizer_;
     MetricType::Pointer metric_;
     TransformType::Pointer transform_;
     OptimizerType::Pointer optimizer_;

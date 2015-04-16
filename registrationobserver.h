@@ -6,22 +6,22 @@
 
 namespace Ui {
 
-class registrationObserver;
+class RegistrationObserver;
 }
 /*!
- * \brief The registrationObserver class. Header created by Qt Designer.
+ * \brief Connection between Qt design sheet and the program.
  * This class takes care of creating the observer window.
  */
-class registrationObserver : public QWidget
+class RegistrationObserver : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit registrationObserver(QWidget *parent = 0);
-    ~registrationObserver();
+    explicit RegistrationObserver(QWidget *parent = 0);
+    ~RegistrationObserver();
 
 //private:
-    Ui::registrationObserver *ui;
+    Ui::RegistrationObserver *ui;
 };
 
 #endif // REGISTRATIONOBSERVER_H

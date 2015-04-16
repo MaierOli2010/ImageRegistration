@@ -14,7 +14,16 @@
 #include "itktypesandincludes.h"
 
 class MyImageClass;
-
+/*!
+ * \brief Provides an observer to visually compare the difference of the 2 series at every iteration.
+ * This class is a observer class which is used to provide a visual compare tool during the registration process.
+ * Everytime the optimizer triggers an iteration event the observer routine is called and the observer GUI is updated.
+ * The visual tool used is a difference image between the moving and fixed series.
+ *
+ * In order to work properly, the observer has to be added to a optimizer.
+ *
+ * For further details regarding observers please read the ITK-Documentation.
+ */
 class MyRegistrationObserver : public itk::Command
 {
 protected:
@@ -30,20 +39,31 @@ public:
 
 
 
-    //Const interface ensures that all options invoked on the optimizer are read-only
+    ///Const interface ensures that all options invoked on the optimizer are read-only
     typedef const OptimizerType* OptimizerPointer;
-    typedef const OptimizerType_1st* ToptimizerPointer;
+    ///Const interface ensures that all options invoked on the optimizer are read-only
+    typedef const TOptimizerType* ToptimizerPointer;
     typedef const RegistrationType* RegistrationTypePointer;
     typedef const TRegistrationType* TRegistrationTypePointer;
+    /*!
+     * \brief Execute observer is not intended to modifie the optimizer, so this function just returns without any actions.
+     * \param caller itk optimizer to be observed
+     * \param event itk event to trigger the observer
+     */
     void Execute(itk::Object *caller, const itk::EventObject &event);
+    /*!
+     * \brief Execute checks if the event is an iteration event and updates the UI.
+     * \param object itk optimizer to be observed.
+     * \param event itk event to trigger the observer.
+     */
     void Execute(const itk::Object *object, const itk::EventObject &event);
 
     void SetSlicePositionObserver(int position);
-    void setObserverWindow(std::unique_ptr<registrationObserver> *regobs);
+    void setObserverWindow(std::unique_ptr<RegistrationObserver> *regobs);
     void setRegistration(RegistrationTypePointer registration);
     void setRegistration(TRegistrationTypePointer registration);
 private:
-    std::unique_ptr<registrationObserver>* regobs_;
+    std::unique_ptr<RegistrationObserver>* regobs_;
     MyImageClass* fixed_image_;
     std::unique_ptr<MyImageClass>* moving_image_;
     FilterType::Pointer connector_result_;

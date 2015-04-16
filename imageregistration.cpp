@@ -21,7 +21,7 @@ ImageRegistration::ImageRegistration(QMainWindow *parent) :
     load_files_hdd_ = new LoadFile(this);
     fixed_image_ = new MyImageClass(this);
     //create Observerwindow
-    regobs_window_ =  std::unique_ptr<registrationObserver> (new registrationObserver);
+    regobs_window_ =  std::unique_ptr<RegistrationObserver> (new RegistrationObserver);
     reg_thread_ = std::unique_ptr<RegistrationThread> (new RegistrationThread);
     regobs_window_->hide();
     regobs_window_->ui->spinBox->setMinimum(0);
@@ -236,7 +236,7 @@ void ImageRegistration::SelectMovingSeries(int position)
     moving_image_vec_[position]->RedrawDICOMImg();
 }
 //Provides a pointer to the observer window
-std::unique_ptr<registrationObserver>* ImageRegistration::GetObserverWindow()
+std::unique_ptr<RegistrationObserver> *ImageRegistration::GetObserverWindow()
 {
     return &regobs_window_;
 }
