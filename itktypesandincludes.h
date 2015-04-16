@@ -29,7 +29,7 @@
 #include <itkRescaleIntensityImageFilter.h>
 #include "itkImageToVTKImageFilter.h"
 #include <itkMetaImageIOFactory.h>
-#include <itkDCMTKImageIOFactory.h>
+//#include <itkDCMTKImageIOFactory.h>
 #include <itkCastImageFilter.h>
 #include <itkHistogramMatchingImageFilter.h>
 
@@ -63,7 +63,7 @@ typedef itk::RegularStepGradientDescentOptimizerv4<InternalPixelType> OptimizerT
 //non-rigid Transform typedefs
 static const unsigned int SpaceDimension = dimension;
 //maybe change SplineOrder later
-static const unsigned int SplineOrder = 3;
+static const unsigned int SplineOrder = 1;
 typedef double CoordinateRepType;
 typedef itk::BSplineTransform<CoordinateRepType,SpaceDimension,SplineOrder> TransformType;
 

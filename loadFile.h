@@ -1,7 +1,13 @@
 #ifndef LOADFILE_H
 #define LOADFILE_H
 
-#include <QtWidgets>
+
+#if MY_QT_VERSION == 4
+    #include <QtGui/QWidget>
+#else
+   #include <QtWidgets>
+#endif
+
 #include <QFileDialog>
 #include <QStringList>
 

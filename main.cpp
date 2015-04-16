@@ -1,5 +1,10 @@
 #include "imageregistration.h"
-#include <QtWidgets/QApplication>
+
+#if MY_QT_VERSION == 4
+    #include <QtGui/QApplication>
+#else
+    #include <QtWidgets/QApplication>
+#endif
 
 
 

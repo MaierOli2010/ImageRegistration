@@ -19,7 +19,8 @@ MyRegistration::MyRegistration(ImageRegistration *myimreg, MyImageClass* fixed_i
                                std::unique_ptr<MyImageClass>* moving_images):
     imreg_(myimreg),
     fixed_image_(fixed_image),
-    moving_images_(moving_images)
+    moving_images_(moving_images),
+    registration_(RegistrationType::New())
 {
     imageViewerDCMSeriesX_result_ = vtkSmartPointer<vtkImageViewer2>::New();
 
@@ -27,7 +28,7 @@ MyRegistration::MyRegistration(ImageRegistration *myimreg, MyImageClass* fixed_i
     transform_ = TransformType::New();
     optimizer_ = OptimizerType::New();
     interpolator_ = InterpolatorType::New();
-    registration_ = RegistrationType::New();
+    //registration_ = RegistrationType::New();
     resampler_ = ResampleFilterType::New();
     difference_ = DifferenceFilterType::New();
     intensity_rescaler_ = RescalerType::New();
@@ -213,7 +214,7 @@ void MyRegistration::StartRegistration()
     TransformType::OriginType    fixedOrigin;
 
     //Default Nodes = 8
-    unsigned int numberOfGridNodesInOneDimension = 8;
+    unsigned int numberOfGridNodesInOneDimension = 4;
 
 
     for( unsigned int i=0; i< SpaceDimension; i++ )
@@ -254,21 +255,21 @@ void MyRegistration::StartRegistration()
 
     const unsigned int numberOfLevels2 = 1;
 
-    RegistrationType::ShrinkFactorsArrayType shrinkFactorsPerLevel2;
-    shrinkFactorsPerLevel2.SetSize( numberOfLevels2 );
-    shrinkFactorsPerLevel2[0] = 1;
-    shrinkFactorsPerLevel2[1] = 2;
-   shrinkFactorsPerLevel2[2] = 3;
+//    RegistrationType::ShrinkFactorsArrayType shrinkFactorsPerLevel2;
+//    shrinkFactorsPerLevel2.SetSize( numberOfLevels2 );
+//    shrinkFactorsPerLevel2[0] = 1;
+//    shrinkFactorsPerLevel2[1] = 2;
+//    shrinkFactorsPerLevel2[2] = 3;
 
-    RegistrationType::SmoothingSigmasArrayType smoothingSigmasPerLevel2;
-    smoothingSigmasPerLevel2.SetSize( numberOfLevels2 );
-    smoothingSigmasPerLevel2[0] = 0;
-    smoothingSigmasPerLevel2[1] = 0;
-    smoothingSigmasPerLevel2[2] = 0;
+//    RegistrationType::SmoothingSigmasArrayType smoothingSigmasPerLevel2;
+//    smoothingSigmasPerLevel2.SetSize( numberOfLevels2 );
+//    smoothingSigmasPerLevel2[0] = 0;
+//    smoothingSigmasPerLevel2[1] = 0;
+//    smoothingSigmasPerLevel2[2] = 0;
 
-    registration_->SetNumberOfLevels( numberOfLevels2 );
-    registration_->SetSmoothingSigmasPerLevel(smoothingSigmasPerLevel2);
-    registration_->SetShrinkFactorsPerLevel(shrinkFactorsPerLevel2);
+//    registration_->SetNumberOfLevels( numberOfLevels2 );
+//    registration_->SetSmoothingSigmasPerLevel(smoothingSigmasPerLevel2);
+//    registration_->SetShrinkFactorsPerLevel(shrinkFactorsPerLevel2);
 
 //    RegistrationType::TransformParametersAdaptorsContainerType adaptors;
 

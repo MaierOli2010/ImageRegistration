@@ -10,6 +10,7 @@
   # to always look for includes there:
   set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+
   set(CMAKE_CXX_FLAGS "-std=gnu++11 -fpermissive")
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
 
@@ -31,6 +32,7 @@
     include_directories(${QT_INCLUDES})
 
   endif(${QT_VERSION} EQUAL 5)
+
 
   find_package(VTK REQUIRED)
   find_package(ITK REQUIRED)
@@ -70,3 +72,6 @@
   endif(${QT_VERSION} EQUAL 5)
 
   target_link_libraries(imageregistration ${ITK_LIBRARIES} ${VTK_LIBRARIES})
+
+
+
